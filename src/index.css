@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply antialiased text-gray-900 bg-white;
+}
+
+.embla {
+  @apply overflow-hidden;
+}
+
+.embla__container {
+  @apply flex;
+}
+
+.embla__slide {
+  @apply flex-[0_0_auto] min-w-0;
+}
