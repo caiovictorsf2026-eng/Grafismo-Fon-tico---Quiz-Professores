@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import useEmblaCarousel from 'embla-carousel-react';
 import AutoScroll from 'embla-carousel-auto-scroll';
 import { 
@@ -267,6 +267,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] text-slate-900 font-sans selection:bg-blue-100 antialiased relative">
+      <h1 className="fixed top-0 left-0 z-[9999] bg-red-500 text-white p-4">RENDERING TEST</h1>
       {/* Background Decor - Changed to absolute */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-blue-50/50 rounded-full blur-[120px] opacity-60" />
@@ -286,8 +287,6 @@ export default function App() {
       {/* Social Proof Notification - Removed as it was a fixed element */}
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 py-12 min-h-screen flex flex-col justify-center">
-        <AnimatePresence mode="wait">
-          
           {/* INTRO */}
           {step === 'intro' && (
             <motion.div
@@ -1087,8 +1086,6 @@ export default function App() {
               </div>
             </motion.div>
           )}
-
-        </AnimatePresence>
       </main>
 
       {/* Footer Branding */}
