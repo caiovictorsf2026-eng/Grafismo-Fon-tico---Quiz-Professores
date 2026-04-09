@@ -1,14 +1,16 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "tsx server.ts",
     "build": "vite build",
     "lint": "tsc"
   },
   "dependencies": {
+    "express": "^5.2.1",
     "lucide-react": "^0.475.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tsx": "^4.21.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

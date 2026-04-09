@@ -31,7 +31,7 @@ const IMAGES = {
   PRODUCT_DETAIL: "https://educacaokids.com.br/wp-content/uploads/2025/05/JcDcvm3874423-643x1024.webp",
   GIRL_HAPPY: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=1000",
   TEACHER_CLASS: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=1000",
-  MOTHER_HELPING: "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&q=80&w=1000", // Group of educators/parents
+  MOTHER_HELPING: "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&q=80&w=1000",
   CRONOGRAMA: "/Gemini_Generated_Image_ks7jfdks7jfdks7j-removebg-preview.png",
   ALFABETO_IMAGEM: "/FRAFISMO-FONETICO-ALFABETO-CADERNO-COM-ALFABETO-300x263.jpg",
   QUEBRA_CABECA: "/GRAFISMO-FONETICO-ALFABETO-QUEBRA-CABECA-COM-ALFABETO-300x263.jpg",
@@ -111,8 +111,6 @@ const QUIZ_DATA = {
   ]
 };
 
-// --- Carousel Component Removed for Troubleshooting ---
-
 export default function App() {
   const [step, setStep] = useState<'intro' | 'questions' | 'lead' | 'analyzing' | 'result' | 'upsell'>('intro');
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -124,7 +122,6 @@ export default function App() {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationData, setNotificationData] = useState({ name: '', action: '' });
 
-  // Social Proof Notifications
   useEffect(() => {
     const names = ['Ana', 'Beatriz', 'Carla', 'Daniela', 'Elaine', 'Fernanda', 'Gabriela', 'Helena', 'Isabela', 'Juliana'];
     const actions = ['acabou de receber o diagnóstico', 'garantiu o Kit com desconto', 'iniciou o desafio de 15 dias'];
@@ -143,7 +140,6 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Countdown timer logic
   useEffect(() => {
     if (step === 'result' && timeLeft > 0) {
       const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
@@ -158,34 +154,33 @@ export default function App() {
   };
 
   const handleAnswer = (value: string) => {
-    const newAnswers = { ...answers, [QUIZ_DATA.questions[currentIdx].id]: value };
-    setAnswers(newAnswers);
+    const currentQuestion = QUIZ_DATA.questions[currentIdx];
+    setAnswers(prev => ({ ...prev, [currentQuestion.id]: value }));
     
     if (currentIdx < QUIZ_DATA.questions.length - 1) {
-      setCurrentIdx(currentIdx + 1);
+      setCurrentIdx(prev => prev + 1);
     } else {
       setStep('lead');
     }
   };
 
-  const startAnalysis = () => {
+  const handleLeadSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     setStep('analyzing');
-    const texts = [
-      'Analisando suas respostas...',
-      'Identificando padrões de grafismo...',
-      'Avaliando necessidades fonéticas...',
-      'Gerando seu plano de ação...',
-      'Finalizando diagnóstico...'
-    ];
-    
+    startAnalysis();
+  };
+
+  const startAnalysis = () => {
     let progress = 0;
     const interval = setInterval(() => {
-      progress += 1;
+      progress += 2;
       setAnalysisProgress(progress);
       
-      const textIdx = Math.floor((progress / 100) * texts.length);
-      if (texts[textIdx]) setAnalysisText(texts[textIdx]);
-      
+      if (progress < 30) setAnalysisText('Cruzando dados pedagógicos...');
+      else if (progress < 60) setAnalysisText('Identificando padrões de grafismo...');
+      else if (progress < 90) setAnalysisText('Gerando plano de intervenção...');
+      else setAnalysisText('Diagnóstico concluído!');
+
       if (progress >= 100) {
         clearInterval(interval);
         setTimeout(() => setStep('result'), 500);
@@ -206,21 +201,16 @@ export default function App() {
   const currentDate = new Date().toLocaleDateString('pt-BR');
 
   const result = useMemo(() => {
-    // For this specific challenge, we return a single diagnostic result
     return QUIZ_DATA.results[0];
   }, [answers]);
 
-  const whatsappUrl = "https://api.whatsapp.com/send?phone=5500000000000&text=Eu%20fiz%20o%20diagnóstico%20e%20quero%20o%20Desafio%2021%20Dias%20de%20Grafismo%20Fonético";
-
   return (
     <div className="min-h-screen bg-[#FDFDFD] text-slate-900 font-sans selection:bg-blue-100 antialiased relative">
-      {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-blue-50/50 rounded-full blur-[120px] opacity-60" />
         <div className="absolute bottom-[-10%] left-[-5%] w-[45%] h-[45%] bg-yellow-50/50 rounded-full blur-[120px] opacity-60" />
       </div>
 
-      {/* Header Scarcity */}
       {step === 'result' && (
         <div className="bg-slate-900 text-white text-center py-2.5 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] z-50 flex items-center justify-center gap-3 px-4 backdrop-blur-md bg-opacity-95">
           <div className="flex items-center gap-2">
@@ -231,27 +221,19 @@ export default function App() {
       )}
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 py-12 min-h-screen flex flex-col justify-center">
-          {/* INTRO */}
           {step === 'intro' && (
-            <div
-              className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 py-8"
-            >
+            <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 py-8">
               <div className="flex-1 text-center lg:text-left">
-                <div 
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 text-[10px] font-black uppercase tracking-[0.2em] mb-6 border border-blue-100/50 shadow-sm"
-                >
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 text-[10px] font-black uppercase tracking-[0.2em] mb-6 border border-blue-100/50 shadow-sm">
                   <Sparkles className="w-3.5 h-3.5" />
                   Diagnóstico Pedagógico Grátis
                 </div>
-                
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-black text-slate-900 mb-6 leading-[1.1] tracking-tight">
                   Descubra o Nível de <span className="text-blue-600">Alfabetização</span> da sua Turma
                 </h1>
-                
                 <p className="text-slate-600 text-lg md:text-xl mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0 font-medium">
                   Responda 5 perguntas rápidas e receba um <span className="text-slate-900 font-bold">Diagnóstico Completo</span> + Plano de Ação baseado no Grafismo Fonético.
                 </p>
-                
                 <div className="flex flex-col sm:flex-row items-center gap-8 justify-center lg:justify-start mb-10">
                   <button
                     onClick={() => setStep('questions')}
@@ -260,7 +242,6 @@ export default function App() {
                     <span className="line-clamp-1">Começar Agora</span>
                     <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                   </button>
-                  
                   <div className="flex items-center gap-3">
                     <div className="flex -space-x-2">
                       {[1,2,3].map(i => (
@@ -272,7 +253,6 @@ export default function App() {
                     </p>
                   </div>
                 </div>
-
                 <div className="flex flex-wrap justify-center lg:justify-start gap-6 opacity-60">
                   {[
                     { icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />, text: "BNCC" },
@@ -286,633 +266,204 @@ export default function App() {
                   ))}
                 </div>
               </div>
-
               <div className="flex-1 relative w-full max-w-md lg:max-w-none">
-                <div
-                  className="relative z-10 rounded-[2.5rem] overflow-hidden shadow-[0_48px_96px_-24px_rgba(0,0,0,0.2)] border-[12px] border-white group"
-                >
-                  <img 
-                    src={IMAGES.MOCKUP_MAIN} 
-                    alt="Kit Grafismo Fonético" 
-                    className="w-full h-auto transform group-hover:scale-105 transition-transform duration-1000"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="relative z-10 rounded-[2.5rem] overflow-hidden shadow-[0_48px_96px_-24px_rgba(0,0,0,0.2)] border-[12px] border-white group">
+                  <img src={IMAGES.MOCKUP_MAIN} alt="Kit" className="w-full h-auto transform group-hover:scale-105 transition-transform duration-1000" referrerPolicy="no-referrer" />
                 </div>
-                
-                {/* Decorative Blobs */}
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl -z-10 animate-pulse" />
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-400/20 rounded-full blur-3xl -z-10 animate-pulse" />
               </div>
             </div>
           )}
 
-          {/* QUESTIONS */}
           {step === 'questions' && (
-            <div
-              className="w-full max-w-2xl mx-auto"
-            >
+            <div className="max-w-2xl mx-auto w-full">
               <div className="mb-12">
                 <div className="flex justify-between items-end mb-4">
-                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">
-                    Diagnóstico Pedagógico
-                  </span>
-                  <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
-                    {Math.round(((currentIdx + 1) / QUIZ_DATA.questions.length) * 100)}% Concluído
-                  </span>
+                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">Pergunta {currentIdx + 1} de {QUIZ_DATA.questions.length}</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{Math.round(((currentIdx + 1) / QUIZ_DATA.questions.length) * 100)}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-blue-600"
-                    style={{ width: `${((currentIdx + 1) / QUIZ_DATA.questions.length) * 100}%` }}
-                  />
+                  <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${((currentIdx + 1) / QUIZ_DATA.questions.length) * 100}%` }} />
                 </div>
               </div>
-
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-10 leading-tight">
-                {QUIZ_DATA.questions[currentIdx].text}
-              </h2>
-
+              <h2 className="text-2xl md:text-3xl font-display font-black text-slate-900 mb-10 leading-tight">{QUIZ_DATA.questions[currentIdx].text}</h2>
               <div className="grid gap-4">
-                {QUIZ_DATA.questions[currentIdx].options.map((opt, i) => (
+                {QUIZ_DATA.questions[currentIdx].options.map((opt: { text: string; value: string }, i: number) => (
                   <button
                     key={i}
                     onClick={() => handleAnswer(opt.value)}
-                    className="w-full text-left p-6 rounded-2xl bg-white border border-slate-100 hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/5 transition-all flex justify-between items-center group shadow-sm relative overflow-hidden"
+                    className="group flex items-center justify-between p-6 bg-white border-2 border-slate-100 rounded-2xl hover:border-blue-600 hover:bg-blue-50/30 transition-all text-left"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="text-lg font-bold text-slate-700 group-hover:text-blue-700 relative z-10 line-clamp-2">{opt.text}</span>
-                    <div className="w-8 h-8 rounded-full border-2 border-slate-100 flex items-center justify-center group-hover:border-blue-500 group-hover:bg-blue-50 transition-all relative z-10">
-                      <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 transition-colors" />
-                    </div>
+                    <span className="text-slate-700 font-bold group-hover:text-blue-700 transition-colors">{opt.text}</span>
+                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 transition-colors" />
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* LEAD CAPTURE */}
           {step === 'lead' && (
-            <div
-              className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24"
-            >
-              <div className="flex-1 hidden lg:block relative">
-                <div
-                  className="relative group"
-                >
-                  <img 
-                    src={IMAGES.TEACHER_CLASS} 
-                    alt="Professora em sala" 
-                    className="rounded-[4rem] shadow-[0_64px_128px_-32px_rgba(0,0,0,0.25)] border-[16px] border-white aspect-[4/3] object-cover transition-transform duration-1000 group-hover:scale-[1.02]"
-                    referrerPolicy="no-referrer"
+            <div className="max-w-xl mx-auto w-full text-center">
+              <div className="w-24 h-24 bg-blue-600 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-200">
+                <Mail className="w-12 h-12 text-white" />
+              </div>
+              <h2 className="text-3xl font-display font-black text-slate-900 mb-4">Para onde enviamos seu Diagnóstico?</h2>
+              <p className="text-slate-500 font-medium mb-10">Insira seus dados para liberar o resultado e o plano de ação personalizado.</p>
+              <form onSubmit={handleLeadSubmit} className="space-y-4">
+                <div className="relative group">
+                  <User className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                  <input
+                    required
+                    type="text"
+                    placeholder="Seu nome completo"
+                    className="w-full pl-16 pr-6 py-5 bg-white border-2 border-slate-100 rounded-2xl focus:border-blue-600 focus:outline-none font-bold transition-all"
+                    value={lead.name}
+                    onChange={e => setLead(prev => ({ ...prev, name: e.target.value }))}
                   />
-                  {/* Glassmorphism Analysis Badge */}
-                  <div className="absolute -bottom-10 -right-10 bg-white/95 backdrop-blur-2xl p-8 rounded-[3rem] shadow-2xl border border-white max-w-[280px] z-20">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-200" />
-                      <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em]">Análise em tempo real</span>
+                </div>
+                <div className="relative group">
+                  <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                  <input
+                    required
+                    type="email"
+                    placeholder="Seu melhor e-mail"
+                    className="w-full pl-16 pr-6 py-5 bg-white border-2 border-slate-100 rounded-2xl focus:border-blue-600 focus:outline-none font-bold transition-all"
+                    value={lead.email}
+                    onChange={e => setLead(prev => ({ ...prev, email: e.target.value }))}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full py-6 bg-slate-900 text-white rounded-2xl font-black text-lg shadow-2xl shadow-slate-200 hover:bg-blue-600 transition-all flex items-center justify-center gap-4 group"
+                >
+                  <span>GERAR MEU DIAGNÓSTICO AGORA</span>
+                  <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-2" />
+                </button>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                  <Lock className="w-4 h-4 text-emerald-500" /> Seus dados estão 100% seguros
+                </p>
+              </form>
+            </div>
+          )}
+
+          {step === 'analyzing' && (
+            <div className="max-w-md mx-auto w-full text-center">
+              <div className="relative w-48 h-48 mx-auto mb-12">
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle cx="96" cy="96" r="92" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-100" />
+                  <circle cx="96" cy="96" r="92" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="578" strokeDashoffset={578 - (578 * analysisProgress) / 100} className="text-blue-600 transition-all duration-300" />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-4xl font-display font-black text-slate-900">{analysisProgress}%</span>
+                </div>
+              </div>
+              <h2 className="text-2xl font-display font-black text-slate-900 mb-4">{analysisText}</h2>
+              <div className="flex justify-center gap-2">
+                {[0, 1, 2].map(i => (
+                  <div key={i} className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.2}s` }} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === 'result' && (
+            <div className="w-full py-8">
+              <div className="bg-white rounded-[3rem] shadow-[0_64px_128px_-32px_rgba(0,0,0,0.1)] overflow-hidden border border-slate-100">
+                <div className="bg-blue-600 p-12 text-center text-white relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 text-white text-[10px] font-black uppercase tracking-[0.2em] mb-6 backdrop-blur-sm border border-white/10">
+                      <ShieldCheck className="w-4 h-4" />
+                      Diagnóstico Concluído com Sucesso
                     </div>
-                    <p className="text-lg font-display font-black text-slate-900 leading-tight italic">
-                      "O método que faltava para minhas turmas de alfabetização."
-                    </p>
-                    <div className="mt-4 flex items-center gap-2">
-                      <div className="flex -space-x-2">
-                        {[1,2,3].map(i => (
-                          <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-slate-200" />
+                    <h2 className="text-4xl md:text-5xl font-display font-black mb-4 tracking-tight">Seus alunos estão no nível <span className="text-yellow-300 underline decoration-wavy underline-offset-8">Crítico</span></h2>
+                    <p className="text-blue-100 text-lg font-medium max-w-2xl mx-auto">O Grafismo Fonético é a peça que falta para destravar a alfabetização na sua sala de aula.</p>
+                  </div>
+                </div>
+
+                <div className="p-8 md:p-16">
+                  <div className="grid lg:grid-cols-2 gap-16 items-start">
+                    <div>
+                      <h3 className="text-2xl font-display font-black text-slate-900 mb-8 flex items-center gap-4">
+                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                          <Brain className="w-6 h-6 text-blue-600" />
+                        </div>
+                        Análise Pedagógica Detalhada
+                      </h3>
+                      <div className="space-y-6">
+                        {[
+                          { title: "Foco no Traço", desc: "A dificuldade não é motora, é cognitiva. O cérebro não associou o som ao movimento." },
+                          { title: "Espelhamento", desc: "Sinal claro de que a lateralidade e a percepção fonética precisam de reforço imediato." },
+                          { title: "Engajamento", desc: "Alunos desmotivados porque o método tradicional é cansativo e sem estímulo visual." }
+                        ].map((item, i) => (
+                          <div key={i} className="flex gap-6 p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:border-blue-200 transition-colors group">
+                            <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                              <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                            </div>
+                            <div>
+                              <h4 className="font-black text-slate-900 mb-1">{item.title}</h4>
+                              <p className="text-sm text-slate-500 font-medium leading-relaxed">{item.desc}</p>
+                            </div>
+                          </div>
                         ))}
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400">+1.2k professoras</span>
+                    </div>
+
+                    <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-2xl">
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-[80px] -mr-32 -mt-32" />
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-4 mb-8">
+                          <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-900/50">
+                            <Zap className="w-8 h-8 text-white" />
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Solução Recomendada</span>
+                            <h4 className="text-xl font-black">Desafio 21 Dias de Grafismo</h4>
+                          </div>
+                        </div>
+                        <p className="text-slate-400 font-medium mb-8 leading-relaxed">Um método passo a passo para você aplicar 15 minutos por dia e ver a evolução real na escrita dos seus alunos em apenas 3 semanas.</p>
+                        <ul className="space-y-4 mb-10">
+                          {["+400 Atividades Prontas", "Alinhado à BNCC", "Foco em Consciência Fonológica"].map((item, i) => (
+                            <li key={i} className="flex items-center gap-3 text-sm font-bold">
+                              <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="p-6 bg-white/5 rounded-2xl border border-white/10 mb-8">
+                          <div className="flex justify-between items-end mb-2">
+                            <span className="text-slate-400 font-bold text-sm">Oferta expira em:</span>
+                            <span className="text-2xl font-mono font-black text-yellow-400">{formatTime(timeLeft)}</span>
+                          </div>
+                          <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-yellow-400 transition-all duration-1000" style={{ width: `${(timeLeft / 900) * 100}%` }} />
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setStep('upsell')}
+                          className="w-full py-6 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-2xl shadow-blue-900/50 hover:bg-blue-500 transition-all flex items-center justify-center gap-4 group"
+                        >
+                          <span>LIBERAR MEU ACESSO COM DESCONTO</span>
+                          <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-2" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              <div className="flex-1 text-center lg:text-left w-full max-w-md mx-auto lg:mx-0">
-                <div className="w-24 h-24 bg-slate-900 text-white rounded-[2.5rem] flex items-center justify-center mb-10 shadow-2xl shadow-slate-200 mx-auto lg:mx-0 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <Mail className="w-12 h-12 relative z-10" />
-                </div>
-                <h2 className="text-5xl font-display font-black text-slate-900 mb-6 leading-tight">Diagnóstico <span className="text-blue-600 italic">Pronto!</span></h2>
-                <p className="text-slate-600 mb-12 text-xl font-medium leading-relaxed opacity-90">
-                  Identificamos o perfil de aprendizado. Informe seu e-mail para desbloquear o resultado e receber o <span className="text-blue-600 font-black">Guia de Atividades Bônus</span>.
-                </p>
-                
-                <div className="space-y-6">
-                  <div className="relative group">
-                    <User className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-                    <input
-                      type="text"
-                      placeholder="Seu nome"
-                      value={lead.name}
-                      onChange={(e) => setLead({ ...lead, name: e.target.value })}
-                      className="w-full bg-white border-2 border-slate-100 rounded-[2rem] py-6 pl-16 pr-8 focus:outline-none focus:border-blue-600 focus:ring-8 focus:ring-blue-600/5 transition-all shadow-sm font-bold text-slate-800 text-lg"
-                    />
-                  </div>
-                  <div className="relative group">
-                    <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-                    <input
-                      type="email"
-                      placeholder="Seu melhor e-mail"
-                      value={lead.email}
-                      onChange={(e) => setLead({ ...lead, email: e.target.value })}
-                      className="w-full bg-white border-2 border-slate-100 rounded-[2rem] py-6 pl-16 pr-8 focus:outline-none focus:border-blue-600 focus:ring-8 focus:ring-blue-600/5 transition-all shadow-sm font-bold text-slate-800 text-lg"
-                    />
-                  </div>
-                  <button
-                    onClick={startAnalysis}
-                    disabled={!lead.name || !lead.email}
-                    className="w-full py-7 bg-blue-600 text-white rounded-[2rem] font-black text-xl flex items-center justify-center gap-4 hover:bg-slate-900 transition-all duration-500 shadow-2xl shadow-blue-600/20 disabled:opacity-50 disabled:shadow-none group"
-                  >
-                    <span className="line-clamp-1">GERAR DIAGNÓSTICO AGORA</span>
-                    <ArrowRight className="w-7 h-7 transition-transform group-hover:translate-x-3" />
-                  </button>
-                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em] text-center mt-8 flex items-center justify-center gap-2">
-                    <Lock className="w-4 h-4 text-emerald-500" /> Seus dados estão 100% seguros
-                  </p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* ANALYZING */}
-          {step === 'analyzing' && (
-            <div
-              className="text-center max-w-lg mx-auto py-20"
-            >
-              <div className="relative w-56 h-56 mx-auto mb-16">
-                {/* Background Glow */}
-                <div className="absolute inset-0 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
-                
-                <svg className="w-full h-full relative z-10" viewBox="0 0 100 100">
-                  <circle 
-                    className="text-slate-100/50 stroke-current" 
-                    strokeWidth="4" 
-                    fill="transparent" 
-                    r="46" cx="50" cy="50" 
-                  />
-                  <circle 
-                    className="text-blue-600 stroke-current" 
-                    strokeWidth="4" 
-                    strokeLinecap="round" 
-                    fill="transparent" 
-                    r="46" cx="50" cy="50"
-                    style={{
-                      strokeDasharray: 289,
-                      strokeDashoffset: 289 - (289 * analysisProgress) / 100,
-                      transform: 'rotate(-90deg)',
-                      transformOrigin: '50% 50%'
-                    }}
-                  />
-                </svg>
-                
-                <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
-                  <span 
-                    className="text-6xl font-display font-black text-slate-900 tracking-tighter"
-                  >
-                    {analysisProgress}%
-                  </span>
-                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em] mt-2">Analisando Perfil</span>
-                </div>
-              </div>
-
-              <div className="space-y-6 relative z-10">
-                <h3 className="text-3xl font-display font-black text-slate-900 leading-tight">
-                  {analysisText}
-                </h3>
-                <p className="text-lg text-slate-500 font-medium max-w-sm mx-auto leading-relaxed">
-                  Aguarde enquanto geramos seu relatório pedagógico personalizado...
-                </p>
-              </div>
-
-              {/* Status Indicators */}
-              <div className="mt-12 flex justify-center gap-3">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* RESULT */}
-          {step === 'result' && (
-            <div
-              className="w-full"
-            >
-              {/* Hero Result Section */}
-              <div className="text-center mb-16 pt-8">
-                <div className="max-w-4xl mx-auto mb-10">
-                  <div
-                    className="relative"
-                  >
-                    <img 
-                      src={IMAGES.MOCKUP_MAIN} 
-                      alt="Kit Grafismo Fonético" 
-                      className="w-full max-w-2xl mx-auto mb-8 drop-shadow-2xl"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute -top-4 -right-4 md:top-0 md:right-0 bg-yellow-400 text-slate-900 font-black text-[10px] md:text-xs px-4 py-2 rounded-full shadow-lg rotate-12 flex items-center gap-2">
-                      <GraduationCap className="w-4 h-4" />
-                      CERTIFICADO INCLUSO
-                    </div>
-                  </div>
-                  <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-black text-slate-900 mb-6 leading-tight">
-                    A <span className="text-blue-600">Estratégia Pedagógica</span> que ensina seus alunos a ler até <span className="bg-yellow-200 px-2">5x mais rápido</span>, sem sobrecarga!
-                  </h2>
-                  <p className="text-xl md:text-2xl text-slate-600 font-bold mb-8">
-                    Com apenas <span className="text-blue-600">10 minutos por dia</span> na sua rotina escolar ou de reforço.
-                  </p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-                    {[
-                      "Alinhado à BNCC para Educação Infantil e Fundamental I",
-                      "Ideal para turmas heterogêneas e inclusão",
-                      "Funciona com TDAH, Autismo e dificuldades de foco"
-                    ].map((text, i) => (
-                      <div key={i} className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 flex items-start gap-3 text-left shadow-sm">
-                        <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                        <span className="text-xs font-bold text-slate-700 leading-tight">{text}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <a
-                    href="#offers"
-                    className="inline-flex items-center gap-4 px-10 py-7 bg-emerald-500 text-white rounded-2xl font-black text-xl md:text-2xl shadow-2xl shadow-emerald-200 hover:bg-emerald-600 transition-all"
-                  >
-                    <span className="line-clamp-1">QUERO MEUS ALUNOS LENDO COM FLUÊNCIA!</span>
-                    <ArrowRight className="w-6 h-6" />
-                  </a>
-                </div>
-              </div>
-
-              {/* BNCC Alignment Section - Refined as a "Seal of Approval" */}
-              <div className="mb-24 py-16 bg-white rounded-[4rem] border-2 border-blue-100 px-8 text-center relative overflow-hidden shadow-xl shadow-blue-500/5">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16" />
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-yellow-50 rounded-full -ml-12 -mb-12" />
-                
-                <div className="relative z-10 max-w-4xl mx-auto">
-                  <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white mx-auto mb-8 shadow-lg shadow-blue-200">
-                    <ShieldCheck className="w-10 h-10" />
-                  </div>
-                  <h3 className="text-3xl md:text-4xl font-display font-black text-slate-900 mb-6">Metodologia 100% Alinhada à BNCC</h3>
-                  <p className="text-lg text-slate-600 font-medium mb-10 leading-relaxed max-w-2xl mx-auto">
-                    Desenvolvido por especialistas para atender aos objetivos de aprendizagem da <span className="text-blue-600 font-bold">Base Nacional Comum Curricular</span>, focando no desenvolvimento integral da criança.
-                  </p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {[
-                      { title: "Consciência Fonológica", code: "EF01LP06", desc: "Segmentação de palavras e rimas." },
-                      { title: "Coordenação Fina", code: "EI03CG05", desc: "Controle motor e precisão do traço." },
-                      { title: "Percepção Visual", code: "EF01LP02", desc: "Reconhecimento de formas e letras." }
-                    ].map((item, i) => (
-                      <div key={i} className="bg-slate-50 p-6 rounded-3xl border border-slate-100 text-left">
-                        <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">{item.code}</div>
-                        <h4 className="font-black text-slate-900 mb-2">{item.title}</h4>
-                        <p className="text-xs text-slate-500 font-medium leading-tight">{item.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Who is this for? Section */}
-              <div className="mb-24 py-16">
-                <h3 className="text-3xl font-display font-black text-slate-900 mb-12 text-center">Este Kit foi feito para você que é:</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {[
-                    { title: "Professor(a)", desc: "Que busca atividades prontas e alinhadas à BNCC.", icon: <User className="w-6 h-6" /> },
-                    { title: "Reforço Escolar", desc: "Que precisa de resultados rápidos e visíveis.", icon: <Sparkles className="w-6 h-6" /> },
-                    { title: "Psicopedagogo(a)", desc: "Que trabalha com intervenções clínicas focadas.", icon: <Brain className="w-6 h-6" /> },
-                    { title: "Escola", desc: "Que deseja padronizar a excelência na alfabetização.", icon: <GraduationCap className="w-6 h-6" /> }
-                  ].map((item, i) => (
-                    <div key={i} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
-                        {item.icon}
-                      </div>
-                      <h4 className="font-black text-slate-900 mb-2">{item.title}</h4>
-                      <p className="text-sm text-slate-500 font-medium leading-relaxed">{item.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pain Points Section */}
-              <div className="mb-24 py-16 bg-slate-50 rounded-[4rem] px-8 text-center border border-slate-100">
-                <h3 className="text-2xl md:text-3xl font-display font-black text-slate-900 mb-12">
-                  Você já sentiu que <span className="bg-yellow-200 px-2">"está falhando"</span> com algum aluno que não evolui?
-                </h3>
-                <div className="max-w-2xl mx-auto space-y-4 mb-10">
-                  {[
-                    "Alunos desmotivados que evitam as atividades de leitura",
-                    "Pressão dos pais por resultados que demoram a chegar",
-                    "Dificuldade em adaptar o material para alunos com necessidades especiais"
-                  ].map((text, i) => (
-                    <div key={i} className="bg-white p-5 rounded-2xl border-2 border-dashed border-red-100 text-red-600 font-bold flex items-center justify-center gap-3">
-                      <AlertCircle className="w-5 h-5" />
-                      {text}
-                    </div>
-                  ))}
-                </div>
-                <p className="text-xl font-bold text-slate-900">
-                  O problema não é você, <span className="text-blue-600">é o método tradicional</span> que ignora como o cérebro da criança realmente processa os sons.
-                </p>
-              </div>
-
-              {/* The Solution Explanation */}
-              <div className="mb-24 text-center max-w-3xl mx-auto">
-                <div className="w-20 h-20 bg-emerald-100 rounded-3xl flex items-center justify-center text-emerald-600 mx-auto mb-8">
-                  <Sparkles className="w-10 h-10" />
-                </div>
-                <h3 className="text-3xl font-display font-black text-slate-900 mb-6">
-                  O <span className="text-blue-600">Grafismo Fonético</span> é a ponte entre o som e a escrita
-                </h3>
-                <p className="text-lg text-slate-600 font-medium leading-relaxed mb-8">
-                  Diferente das cópias repetitivas, nosso método utiliza o movimento para fixar o som. A criança "sente" a letra antes de escrevê-la, criando um caminho neural muito mais forte.
-                </p>
-                <div className="flex justify-center">
-                  <ChevronRight className="w-10 h-10 text-emerald-500 rotate-90" />
-                </div>
-              </div>
-
-              {/* Benefits Section */}
-              <div className="mb-24 py-16 bg-yellow-50/30 rounded-[4rem] px-8">
-                <div className="flex flex-col lg:flex-row items-center gap-12 max-w-5xl mx-auto">
-                  <div className="flex-1">
-                    <img src={IMAGES.PRODUCT_DETAIL} alt="Detalhes do Kit" className="w-full rounded-3xl shadow-2xl" referrerPolicy="no-referrer" />
-                  </div>
-                  <div className="flex-1 space-y-6">
-                    <h3 className="text-2xl font-display font-black text-slate-900 mb-8">
-                      Por que este Kit é o braço direito do educador:
-                    </h3>
-                    {[
-                      "Material pronto para imprimir (economize horas de planejamento)",
-                      "Atividades lúdicas que mantêm o foco até dos mais agitados",
-                      "Sequência lógica que respeita o desenvolvimento neuropsicológico",
-                      "Resultados visíveis nas primeiras 3 semanas de aplicação",
-                      "Redução drástica da frustração do aluno e do professor"
-                    ].map((text, i) => (
-                      <div key={i} className="flex items-center gap-3 text-slate-700 font-bold">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                        <span>{text}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Certificate Section - Refined */}
-              <div className="mb-24 py-16 bg-slate-900 rounded-[4rem] text-white px-8 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-blue-600/20 to-transparent opacity-50" />
-                <div className="relative z-10 max-w-4xl mx-auto">
-                  <div className="w-24 h-24 bg-yellow-400 text-slate-900 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl shadow-yellow-400/20">
-                    <GraduationCap className="w-12 h-12" />
-                  </div>
-                  <h3 className="text-3xl md:text-4xl font-display font-black mb-6">Certificado de Conclusão Incluso</h3>
-                  <p className="text-lg text-blue-100 font-medium mb-10 leading-relaxed max-w-2xl mx-auto">
-                    Ao finalizar o cronograma de 21 dias, você receberá um <span className="text-yellow-400 font-bold">Certificado de Aplicação Pedagógica</span>, validando sua dedicação e o uso de metodologias inovadoras na alfabetização.
-                  </p>
-                  <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 rounded-full border border-white/20 text-sm font-bold">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    Válido para Horas Complementares e Currículo
-                  </div>
-                </div>
-              </div>
-
-              {/* Kit Contents Recap */}
-              <div className="mb-24 py-16 bg-slate-900 rounded-[4rem] text-white overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl -mr-32 -mt-32" />
-                <div className="relative z-10 px-8">
-                  <h3 className="text-3xl md:text-4xl font-display font-black mb-12 text-center">O QUE VOCÊ RECEBE IMEDIATAMENTE</h3>
-                  <div className="max-w-4xl mx-auto space-y-4">
-                    {[
-                      { text: "+ DE 100 ATIVIDADES ESTRUTURADAS EM PDF", color: "bg-emerald-500" },
-                      { text: "NÍVEL 01: CONSCIÊNCIA FONOLÓGICA INICIAL", color: "bg-orange-500" },
-                      { text: "NÍVEL 02: SÍLABAS SIMPLES E COMPLEXAS", color: "bg-blue-500" },
-                      { text: "NÍVEL 03: PRODUÇÃO DE FRASES E TEXTOS CURTOS", color: "bg-red-500" },
-                      { text: "GUIA DE ORIENTAÇÃO PARA O PROFESSOR", color: "bg-yellow-500 text-slate-900" }
-                    ].map((item, i) => (
-                      <div key={i} className={`${item.color} p-5 rounded-2xl font-black text-center text-sm md:text-lg shadow-lg transform hover:scale-[1.01] transition-transform`}>
-                        {item.text}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Bonuses Section */}
-              <div className="mb-24 text-center">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-50 text-yellow-700 text-[10px] font-black uppercase tracking-[0.2em] mb-6 border border-yellow-100/50">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Garantindo seu acesso hoje
-                </div>
-                <h3 className="text-3xl md:text-4xl font-display font-black text-slate-900 mb-4">VOCÊ LEVA 7 SUPER BÔNUS 🎁</h3>
-                <p className="text-slate-500 font-medium mb-12">Materiais complementares exclusivos para acelerar o aprendizado:</p>
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-                  {[
-                    { title: "Cronograma 21 Dias", image: IMAGES.CRONOGRAMA },
-                    { title: "Caderno Alfabeto", image: IMAGES.ALFABETO_IMAGEM },
-                    { title: "Quebra-Cabeça", image: IMAGES.QUEBRA_CABECA },
-                    { title: "Formando Palavras", image: IMAGES.FORMANDO_PALAVRAS },
-                    { title: "Alfabeto Relógio", image: IMAGES.ALFABETO_RELOGIO },
-                    { title: "Alfabeto Traçado", image: IMAGES.ALFABETO_TRACADO },
-                    { title: "Alfabeto Carinhas", image: IMAGES.ALFABETO_CARINHAS },
-                    { title: "Certificado", image: IMAGES.MOCKUP_MAIN }
-                  ].map((bonus, i) => (
-                    <div key={i} className="bg-slate-900 p-3 rounded-2xl border border-white/10 flex flex-col items-center text-center">
-                      <img src={bonus.image} alt={bonus.title} className="w-full h-auto rounded-lg mb-2" referrerPolicy="no-referrer" />
-                      <span className="text-[10px] font-bold text-white line-clamp-1">{bonus.title}</span>
-                      <span className="text-[8px] text-emerald-400 font-black mt-1">GRÁTIS</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Final Recap & Price - Two Options */}
-              <div id="offers" className="mb-24 max-w-6xl mx-auto">
-                <div className="text-center mb-12">
-                  <h3 className="text-3xl md:text-4xl font-display font-black text-slate-900 mb-4">Escolha o seu Plano de Acesso</h3>
-                  <p className="text-slate-500 font-medium">Selecione a melhor opção para transformar a alfabetização dos seus alunos hoje.</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Basic Plan */}
-                  <div className="bg-white rounded-[3rem] p-8 md:p-10 border border-slate-100 shadow-xl relative overflow-hidden flex flex-col">
-                    <div className="mb-8">
-                      <span className="bg-slate-100 text-slate-600 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">Versão Básica</span>
-                      <h4 className="text-2xl font-display font-black text-slate-900 mt-4">Kit Essencial</h4>
-                    </div>
-                    
-                    <div className="space-y-4 mb-10 flex-grow">
-                      <div className="flex items-center gap-3 text-slate-700 font-bold text-sm">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                        <span>Atividades de Grafismo Fonético Nível 1, 2 e 3</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-slate-300 font-bold text-sm line-through">
-                        <CheckCircle2 className="w-5 h-5 text-slate-200 shrink-0" />
-                        <span>Todos os 7 Bônus Exclusivos</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-slate-300 font-bold text-sm line-through">
-                        <CheckCircle2 className="w-5 h-5 text-slate-200 shrink-0" />
-                        <span>Certificado de Conclusão</span>
-                      </div>
-                    </div>
-
-                    <div className="mb-8">
-                      <p className="text-slate-400 line-through font-bold text-sm">De R$ 197,00</p>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-4xl font-display font-black text-slate-900">R$ 19,99</span>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => setStep('upsell')}
-                      className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black text-lg shadow-xl hover:bg-blue-600 transition-all flex items-center justify-center"
-                    >
-                      <span className="line-clamp-1 px-4">QUERO O PLANO BÁSICO</span>
-                    </button>
-                  </div>
-
-                  {/* Professional Plan */}
-                  <div 
-                    className="bg-slate-900 rounded-[3rem] p-8 md:p-10 border-4 border-blue-600 shadow-2xl relative overflow-hidden flex flex-col transform md:scale-105 z-10 animate-pulse"
-                    style={{ animationDuration: '3s' }}
-                  >
-                    <div className="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-black px-6 py-2 rounded-bl-2xl uppercase tracking-widest">Mais Vendido</div>
-                    
-                    <div className="mb-8">
-                      <span className="bg-blue-600/20 text-blue-400 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">Versão Profissional</span>
-                      <h4 className="text-2xl font-display font-black text-white mt-4">Kit Completo + Bônus</h4>
-                    </div>
-                    
-                    <div className="space-y-4 mb-10 flex-grow">
-                      <div className="flex items-center gap-3 text-white font-bold text-sm">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                        <span>Atividades Nível 1, 2 e 3</span>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3 text-white font-bold text-sm">
-                          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                          <span>Todos os 7 Bônus Inclusos:</span>
-                        </div>
-                        <div className="ml-8 flex flex-col gap-2 text-slate-400 font-bold text-[11px] border-l-2 border-blue-600/30 pl-4">
-                          <span>• Cronograma 21 Dias (R$ 47)</span>
-                          <span>• Caderno Alfabeto com Imagem (R$ 37)</span>
-                          <span>• Caderno Quebra-Cabeça Alfabeto (R$ 47)</span>
-                          <span>• Caderno Formando Palavras (R$ 57)</span>
-                          <span>• Caderno Alfabeto com Relógio (R$ 39)</span>
-                          <span>• Caderno Alfabeto Traçado (R$ 27)</span>
-                          <span>• Caderno Alfabeto com Carinhas (R$ 49)</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 text-white font-bold text-sm">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                        <span>Certificado de Conclusão</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-white font-bold text-sm">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                        <span>Suporte Prioritário</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-emerald-400 font-black text-sm bg-emerald-400/10 p-2 rounded-lg border border-emerald-400/20">
-                        <CheckCircle2 className="w-5 h-5 shrink-0" />
-                        <span>ACESSO VITALÍCIO</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-blue-400 font-black text-sm bg-blue-400/10 p-2 rounded-lg border border-blue-400/20">
-                        <CheckCircle2 className="w-5 h-5 shrink-0" />
-                        <span>RECEBA DIRETO NO WHATSAPP</span>
-                      </div>
-                    </div>
-
-                    <div className="mb-8">
-                      <p className="text-slate-500 line-through font-bold text-sm">De R$ 500,00</p>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-5xl font-display font-black text-emerald-400">R$ 39,99</span>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => handleRedirect("https://pay.lowify.com.br/checkout.php?product_id=NZmnRg")}
-                      className="w-full py-6 bg-emerald-500 text-white rounded-2xl font-black text-xl shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all text-center flex items-center justify-center"
-                    >
-                      <span className="line-clamp-1 px-4">QUERO O ACESSO COMPLETO!</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Guarantee Section - Non-fixed */}
-              <div className="mb-24 p-12 bg-slate-50 rounded-[4rem] border-4 border-dashed border-slate-200 flex flex-col items-center text-center max-w-2xl mx-auto relative overflow-hidden">
-                <div className="w-64 h-64 mb-8 relative z-10">
-                  <img 
-                    src={IMAGES.GUARANTEE_BADGE} 
-                    alt="Garantia 21 Dias" 
-                    className="w-full h-full object-contain"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-                <h4 className="text-3xl font-display font-black text-slate-900 mb-6">Sua Satisfação ou seu Dinheiro de Volta</h4>
-                <p className="text-lg text-slate-500 font-medium leading-relaxed">
-                  Temos tanta confiança no impacto pedagógico deste material que oferecemos <span className="text-slate-900 font-bold">21 dias de garantia</span>. Se você sentir que o material não agregou valor à sua sala de aula, basta um e-mail para receber o reembolso total.
-                </p>
-              </div>
-
-              {/* FAQ Section */}
-              <div className="mb-24 max-w-3xl mx-auto">
-                <h3 className="text-3xl font-display font-black text-slate-900 mb-10 text-center">Dúvidas Frequentes</h3>
-                <div className="space-y-6">
-                  {[
-                    { q: "Como recebo o material?", a: "Imediatamente após a confirmação do pagamento, você receberá um e-mail com o link para download de todos os arquivos em PDF." },
-                    { q: "Posso imprimir para todos os meus alunos?", a: "Sim! O material é de uso individual do professor, permitindo que você imprima quantas cópias forem necessárias para suas turmas." },
-                    { q: "Serve para alunos com autismo?", a: "Sim, o método de grafismo fonético é altamente recomendado para crianças atípicas, pois trabalha a previsibilidade e o estímulo sensorial do traço." },
-                    { q: "Qual a garantia?", a: "Você tem 21 dias para testar. Se não gostar, devolvemos 100% do valor pago." },
-                  ].map((faq, i) => (
-                    <details key={i} className="group bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden transition-all duration-300">
-                      <summary className="p-8 font-black text-slate-800 cursor-pointer flex justify-between items-center hover:bg-slate-50 transition-colors list-none text-lg">
-                        {faq.q}
-                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-open:rotate-90 transition-transform">
-                          <ChevronRight className="w-5 h-5 text-slate-400" />
-                        </div>
-                      </summary>
-                      <div className="px-8 pb-8 text-slate-500 font-medium leading-relaxed text-lg border-t border-slate-50 pt-6">
-                        {faq.a}
-                      </div>
-                    </details>
-                  ))}
-                </div>
-              </div>
-
-              <div className="text-center pb-20">
-                <button 
-                  onClick={() => { setStep('intro'); setCurrentIdx(0); setAnswers({}); }}
-                  className="text-slate-400 hover:text-blue-600 text-sm font-bold flex items-center justify-center gap-2 mx-auto transition-colors"
-                >
-                  <RefreshCcw className="w-4 h-4" />
-                  Refazer o Diagnóstico
-                </button>
-              </div>
-            </div>
-          )}
-
-
-          {/* UPSELL */}
           {step === 'upsell' && (
-            <div
-              className="w-full max-w-4xl mx-auto py-12"
-            >
-              <div className="bg-white rounded-[3rem] p-8 md:p-16 border-4 border-emerald-500 shadow-2xl relative overflow-hidden text-center">
-                <div className="absolute top-0 left-0 w-full h-4 bg-emerald-500" />
-                
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-[0.2em] mb-8">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  OFERTA EXCLUSIVA DE UPGRADE
+            <div className="max-w-4xl mx-auto w-full py-12">
+              <div className="text-center mb-16">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-[0.2em] mb-6 border border-emerald-100/50 shadow-sm">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Oferta Exclusiva e Única
                 </div>
-
-                <h2 className="text-4xl md:text-6xl font-display font-black text-slate-900 mb-6 leading-tight">
-                  ESPERE! <span className="text-emerald-500">NÃO VÁ AINDA...</span>
+                <h2 className="text-4xl md:text-6xl font-display font-black text-slate-900 mb-6 leading-tight tracking-tight">
+                  ESPERE! VOCÊ ACABA DE GANHAR UM <span className="text-emerald-500">PRESENTE</span> 🎁
                 </h2>
                 
                 <p className="text-xl text-slate-600 font-bold mb-12 max-w-2xl mx-auto">
@@ -968,7 +519,6 @@ export default function App() {
           )}
       </main>
 
-      {/* Footer Branding */}
       <footer className="py-12 text-center opacity-40">
         <span className="text-[10px] font-bold text-slate-400 tracking-[0.5em] uppercase">Educação Kids • Desafio 21 Dias</span>
       </footer>
