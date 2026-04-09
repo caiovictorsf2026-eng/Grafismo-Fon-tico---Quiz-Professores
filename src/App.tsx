@@ -4,8 +4,6 @@
  */
 
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import useEmblaCarousel from 'embla-carousel-react';
-import AutoScroll from 'embla-carousel-auto-scroll';
 import { 
   ChevronRight, 
   CheckCircle2, 
@@ -113,57 +111,7 @@ const QUIZ_DATA = {
   ]
 };
 
-// --- Carousel Component ---
-const BonusCarousel = () => {
-  const bonuses = [
-    { title: "Cronograma 21 Dias", desc: "Passo a passo diário para aplicar sem erros e ter resultados rápidos.", price: "R$ 47", image: IMAGES.CRONOGRAMA },
-    { title: "Caderno Alfabeto com Imagem", desc: "Associação visual para fixação das letras de forma lúdica.", price: "R$ 37", image: IMAGES.ALFABETO_IMAGEM },
-    { title: "Caderno Quebra-Cabeça Alfabeto", desc: "Atividades de quebra-cabeça para fixação divertida.", price: "R$ 47", image: IMAGES.QUEBRA_CABECA },
-    { title: "Caderno Formando Palavras", desc: "Exercícios que incentivam leitura e escrita.", price: "R$ 57", image: IMAGES.FORMANDO_PALAVRAS },
-    { title: "Caderno Alfabeto com Relógio", desc: "Ensina as letras junto a noções de tempo.", price: "R$ 39", image: IMAGES.ALFABETO_RELOGIO },
-    { title: "Caderno Alfabeto Traçado", desc: "Perfeito para praticar a escrita e coordenação fina.", price: "R$ 27", image: IMAGES.ALFABETO_TRACADO },
-    { title: "Caderno Alfabeto com Carinhas", desc: "Associa letras a carinhas expressivas e divertidas.", price: "R$ 49", image: IMAGES.ALFABETO_CARINHAS }
-  ];
-
-  const [emblaRef] = useEmblaCarousel({ loop: true, align: 'start' }, [
-    AutoScroll({ speed: 1, stopOnInteraction: false, stopOnMouseEnter: false })
-  ]);
-
-  return (
-    <div className="max-w-6xl mx-auto px-4">
-      <div className="overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
-        <div className="flex gap-6 py-8">
-          {bonuses.map((bonus, i) => (
-            <div key={i} className="flex-[0_0_220px] md:flex-[0_0_260px] min-w-0">
-              <div className="bg-slate-900 p-4 rounded-[2rem] border border-white/10 shadow-xl hover:shadow-2xl transition-all group flex flex-col h-full">
-                <div className="rounded-xl overflow-hidden mb-4 relative flex items-center justify-center bg-white/5">
-                  <img 
-                    src={bonus.image || IMAGES.MOCKUP_MAIN} 
-                    alt={bonus.title} 
-                    className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-700" 
-                    referrerPolicy="no-referrer" 
-                  />
-                  <div className="absolute top-2 right-2 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow-lg">
-                    PDF
-                  </div>
-                </div>
-                <h4 className="text-base font-black text-white mb-1 leading-tight">{bonus.title}</h4>
-                <p className="text-[10px] text-slate-400 font-medium leading-relaxed mb-3 flex-grow">{bonus.desc}</p>
-                <div className="pt-3 border-t border-white/5">
-                  <div className="text-[9px] text-red-400 font-bold line-through mb-0.5">De {bonus.price}</div>
-                  <div className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-500/10 text-emerald-400 text-[9px] font-black rounded-full border border-emerald-500/20">
-                    <CheckCircle2 className="w-2.5 h-2.5" />
-                    HOJE É GRÁTIS
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+// --- Carousel Component Removed for Troubleshooting ---
 
 export default function App() {
   const [step, setStep] = useState<'intro' | 'questions' | 'lead' | 'analyzing' | 'result' | 'upsell'>('intro');
@@ -266,13 +214,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] text-slate-900 font-sans selection:bg-blue-100 antialiased relative">
-      {/* Background Decor - Changed to absolute */}
+      {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-blue-50/50 rounded-full blur-[120px] opacity-60" />
         <div className="absolute bottom-[-10%] left-[-5%] w-[45%] h-[45%] bg-yellow-50/50 rounded-full blur-[120px] opacity-60" />
       </div>
 
-      {/* Header Scarcity - Removed sticky as requested */}
+      {/* Header Scarcity */}
       {step === 'result' && (
         <div className="bg-slate-900 text-white text-center py-2.5 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] z-50 flex items-center justify-center gap-3 px-4 backdrop-blur-md bg-opacity-95">
           <div className="flex items-center gap-2">
@@ -281,8 +229,6 @@ export default function App() {
           </div>
         </div>
       )}
-
-      {/* Social Proof Notification - Removed as it was a fixed element */}
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 py-12 min-h-screen flex flex-col justify-center">
           {/* INTRO */}
@@ -764,7 +710,24 @@ export default function App() {
                 <h3 className="text-3xl md:text-4xl font-display font-black text-slate-900 mb-4">VOCÊ LEVA 7 SUPER BÔNUS 🎁</h3>
                 <p className="text-slate-500 font-medium mb-12">Materiais complementares exclusivos para acelerar o aprendizado:</p>
                 
-                <BonusCarousel />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                  {[
+                    { title: "Cronograma 21 Dias", image: IMAGES.CRONOGRAMA },
+                    { title: "Caderno Alfabeto", image: IMAGES.ALFABETO_IMAGEM },
+                    { title: "Quebra-Cabeça", image: IMAGES.QUEBRA_CABECA },
+                    { title: "Formando Palavras", image: IMAGES.FORMANDO_PALAVRAS },
+                    { title: "Alfabeto Relógio", image: IMAGES.ALFABETO_RELOGIO },
+                    { title: "Alfabeto Traçado", image: IMAGES.ALFABETO_TRACADO },
+                    { title: "Alfabeto Carinhas", image: IMAGES.ALFABETO_CARINHAS },
+                    { title: "Certificado", image: IMAGES.MOCKUP_MAIN }
+                  ].map((bonus, i) => (
+                    <div key={i} className="bg-slate-900 p-3 rounded-2xl border border-white/10 flex flex-col items-center text-center">
+                      <img src={bonus.image} alt={bonus.title} className="w-full h-auto rounded-lg mb-2" referrerPolicy="no-referrer" />
+                      <span className="text-[10px] font-bold text-white line-clamp-1">{bonus.title}</span>
+                      <span className="text-[8px] text-emerald-400 font-black mt-1">GRÁTIS</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Final Recap & Price - Two Options */}
