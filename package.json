@@ -1,8 +1,9 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "tsx server.ts",
+    "dev": "vite",
     "build": "vite build",
+    "start": "tsx server.ts",
     "lint": "tsc"
   },
   "dependencies": {

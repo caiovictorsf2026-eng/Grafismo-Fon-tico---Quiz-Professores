@@ -200,10 +200,6 @@ export default function App() {
 
   const currentDate = new Date().toLocaleDateString('pt-BR');
 
-  const result = useMemo(() => {
-    return QUIZ_DATA.results[0];
-  }, [answers]);
-
   return (
     <div className="min-h-screen bg-[#FDFDFD] text-slate-900 font-sans selection:bg-blue-100 antialiased relative">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -216,6 +212,19 @@ export default function App() {
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
             <span>DESCONTO SÓ HOJE NESSA PÁGINA • {currentDate}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Social Proof Notification */}
+      {showNotification && (
+        <div className="fixed bottom-6 left-6 z-[100] bg-white rounded-2xl shadow-2xl p-4 border border-slate-100 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+            <User className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-900">{notificationData.name}</p>
+            <p className="text-[10px] text-slate-500">{notificationData.action}</p>
           </div>
         </div>
       )}
@@ -448,6 +457,30 @@ export default function App() {
                           <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-2" />
                         </button>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-20 text-center">
+                    <h3 className="text-3xl md:text-4xl font-display font-black text-slate-900 mb-4">VOCÊ LEVA 7 SUPER BÔNUS 🎁</h3>
+                    <p className="text-slate-500 font-medium mb-12">Materiais complementares exclusivos para acelerar o aprendizado:</p>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                      {[
+                        { title: "Cronograma 21 Dias", image: IMAGES.CRONOGRAMA },
+                        { title: "Caderno Alfabeto", image: IMAGES.ALFABETO_IMAGEM },
+                        { title: "Quebra-Cabeça", image: IMAGES.QUEBRA_CABECA },
+                        { title: "Formando Palavras", image: IMAGES.FORMANDO_PALAVRAS },
+                        { title: "Alfabeto Relógio", image: IMAGES.ALFABETO_RELOGIO },
+                        { title: "Alfabeto Traçado", image: IMAGES.ALFABETO_TRACADO },
+                        { title: "Alfabeto Carinhas", image: IMAGES.ALFABETO_CARINHAS },
+                        { title: "Certificado", image: IMAGES.MOCKUP_MAIN }
+                      ].map((bonus, i) => (
+                        <div key={i} className="bg-slate-900 p-3 rounded-2xl border border-white/10 flex flex-col items-center text-center">
+                          <img src={bonus.image} alt={bonus.title} className="w-full h-auto rounded-lg mb-2" referrerPolicy="no-referrer" />
+                          <span className="text-[10px] font-bold text-white line-clamp-1">{bonus.title}</span>
+                          <span className="text-[8px] text-emerald-400 font-black mt-1">GRÁTIS</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
