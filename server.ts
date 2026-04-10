@@ -1,18 +1,38 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import fs from "fs";
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  app.use(express.json());
+
   // API routes
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
+  app.post("/api/leads", (req, res) => {
+    const lead = req.body;
+    const leadsPath = path.join(process.cwd(), "leads.json");
+    
+    let leads = [];
+    if (fs.existsSync(leadsPath)) {
+      try {
+        const data = fs.readFileSync(leadsPath, "utf-8");
+        leads = JSON.parse(data);
+      } catch (e) {
+        console.error("Error reading leads file", e);
+      }
+    }
+    
+    leads.push({ ...lead, timestamp: new Date().toISOString() });
+    
+    try {
+      fs.writeFileSync(leadsPath, JSON.stringify(leads, null, 2));
+      res.json({ success: true });
+    } catch (e) {
+      console.error("Error writing leads file", e);
+      res.status(500).json({ error: "Failed to save lead" });
+    }
   });
 
   // Vite middleware for development
