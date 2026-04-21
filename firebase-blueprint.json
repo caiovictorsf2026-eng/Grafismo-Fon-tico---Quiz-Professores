@@ -1,0 +1,36 @@
+{
+  "entities": {
+    "Lead": {
+      "title": "Lead",
+      "description": "Informações capturadas dos usuários que concluíram o quiz.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Nome do usuário"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "E-mail do usuário"
+        },
+        "answers": {
+          "type": "object",
+          "description": "Respostas do quiz"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data e hora da captura"
+        }
+      },
+      "required": ["name", "email", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Coleção de leads capturados."
+    }
+  }
+}

@@ -27,6 +27,8 @@ import {
   Clock,
   Lock
 } from 'lucide-react';
+import { db } from './lib/firebase';
+import { collection, addDoc, serverTimestamp, doc, getDocFromServer } from 'firebase/firestore';
 
 // --- Assets ---
 const IMAGES = {
@@ -179,6 +181,18 @@ export default function App() {
 
   // Social Proof Notifications
   useEffect(() => {
+    // Test Firebase Connection
+    const testConnection = async () => {
+      try {
+        await getDocFromServer(doc(db, 'test', 'connection'));
+      } catch (error) {
+        if(error instanceof Error && error.message.includes('the client is offline')) {
+          console.error("Please check your Firebase configuration.");
+        }
+      }
+    }
+    testConnection();
+
     const names = ['Ana', 'Beatriz', 'Carla', 'Daniela', 'Elaine', 'Fernanda', 'Gabriela', 'Helena', 'Isabela', 'Juliana'];
     const actions = ['acabou de receber o diagnóstico', 'garantiu o Kit com desconto', 'iniciou o desafio de 15 dias'];
     
@@ -224,15 +238,25 @@ export default function App() {
   const startAnalysis = async () => {
     setStep('analyzing');
     
-    // Save lead to backend
+    // Save lead to Firebase Firestore
     try {
-      await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...lead, answers })
+      await addDoc(collection(db, 'leads'), {
+        ...lead,
+        answers,
+        timestamp: serverTimestamp()
       });
     } catch (e) {
-      console.error("Failed to save lead", e);
+      console.error("Failed to save lead to Firebase", e);
+      // Fallback to local API just in case
+      try {
+        await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...lead, answers })
+        });
+      } catch (err) {
+        console.error("Failed to save lead to local API", err);
+      }
     }
 
     const texts = [

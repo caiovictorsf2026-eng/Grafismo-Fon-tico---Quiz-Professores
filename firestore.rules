@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // Lead validation
+    function isValidLead(data) {
+      return data.keys().hasAll(['name', 'email', 'answers', 'timestamp']) &&
+             data.keys().size() == 4 &&
+             data.name is string && data.name.size() >= 2 && data.name.size() <= 100 &&
+             data.email is string && data.email.size() >= 5 && data.email.size() <= 100 &&
+             data.email.matches('^[^@]+@[^@]+\\.[^@]+$') &&
+             data.answers is map &&
+             data.timestamp == request.time;
+    }
+
+    match /leads/{leadId} {
+      allow create: if isValidId(leadId) && isValidLead(incoming());
+      // Admin could read these later, but for now we prioritize collection
+      // allow list, get: if isAdmin(); 
+    }
+  }
+}
